@@ -1,33 +1,70 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/sell">Sell</router-link> |
-    <router-link to="/chat_list">chat</router-link>|
-    <router-link to="/saved_list">saved</router-link>|
-    <router-link to="/profile">profile</router-link>
-  </nav>
-  <router-view/>
+  <div id="app">
+    <Header />
+    <div class="main-content">
+      <router-view />
+    </div>
+    <navbar v-if="!hideNavigation" />
+  </div>
 </template>
 
+<script>
+import Navbar from "./components/Navbar.vue";
+import Header from "./components/Header.vue";
+
+export default {
+  name: "App",
+  components: {
+    Navbar,
+    Header,
+  },
+  data() {
+    return {
+      title: "Vue Navigation Bar",
+      hideNavigation: false,
+    };
+  },
+  created() {
+    this.$router.beforeEach((to, from, next) => {
+      if (to.meta.hideNavigation == true) {
+        this.hideNavigation = true;
+      } else {
+        this.hideNavigation = false;
+      }
+      next();
+    });
+  },
+};
+</script>
+
 <style>
+:root {
+  --text-light-gray: #55575f;
+  --text-purple: #917AFD;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100vh;
+  background-color: #f7fafc;
 }
 
-nav {
-  padding: 30px;
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+@media (max-width: 414px) {
+  .main-content {
+    padding: 10px;
+  }
 }
 </style>

@@ -3,24 +3,27 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
     path: '/title',
     name: 'title',
-    component: () => import('../views/TitleView.vue')
+    component: () => import('../views/TitleView.vue'),
+    meta: { hideNavigation: true }
   },
   {
     path: '/sign_in',
     name: 'sign_in',
-    component: () => import('../views/SignInView.vue')
+    component: () => import('../views/SignInView.vue'),
+    meta: { hideNavigation: true }
   },
   {
     path: '/sign_up',
     name: 'sign_up',
-    component: () => import('../views/SignUpView.vue')
+    component: () => import('../views/SignUpView.vue'),
+    meta: { hideNavigation: true }
+  },
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
   },
   {
     path: '/book_detail',
@@ -45,7 +48,8 @@ const routes = [
   {
     path: '/chat_room',
     name: 'chat_room',
-    component: () => import('../views/ChatRoomView.vue')
+    component: () => import('../views/ChatRoomView.vue'),
+    meta: { hideNavigation: true }
   },
   {
     path: '/saved_list',
