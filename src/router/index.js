@@ -8,13 +8,70 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/title',
+    name: 'title',
+    component: () => import('../views/TitleView.vue')
+  },
+  {
+    path: '/sign_in',
+    name: 'sign_in',
+    component: () => import('../views/SignInView.vue')
+  },
+  {
+    path: '/sign_up',
+    name: 'sign_up',
+    component: () => import('../views/SignUpView.vue')
+  },
+  {
+    path: '/book_detail',
+    name: 'book_detail',
+    component: () => import('../views/BookDetailView.vue')
+  },
+  {
+    path: '/transaction',
+    name: 'transaction',
+    component: () => import('../views/TransactionView.vue')
+  },
+  {
+    path: '/sell',
+    name: 'sell',
+    component: () => import('../views/SellView.vue')
+  },
+  {
+    path: '/chat_list',
+    name: 'chat_list',
+    component: () => import('../views/ChatListView.vue')
+  },
+  {
+    path: '/chat_room',
+    name: 'chat_room',
+    component: () => import('../views/ChatRoomView.vue')
+  },
+  {
+    path: '/saved_list',
+    name: 'saved_list',
+    component: () => import('../views/SavedListView.vue')
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
+    path: '/personal',
+    name: 'personal',
+    component: () => import('../views/PersonalView.vue')
+  },
+  {
+    path: '/setting',
+    name: 'setting',
+    component: () => import('../views/SettingView.vue')
+  },
+  {
+    path: '/FAQ',
+    name: 'FAQ',
+    component: () => import('../views/FAQView.vue')
+  },
 ]
 
 const router = createRouter({
