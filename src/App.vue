@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import Navbar from "./components/Navbar.vue";
-import Header from "./components/Header.vue";
+import Navbar from "./components/Flame/Navbar.vue";
+import Header from "./components/Flame/Header.vue";
 
 export default {
   name: "App",
@@ -40,7 +40,7 @@ export default {
 <style>
 :root {
   --text-light-gray: #55575f;
-  --text-purple: #917AFD;
+  --text-purple: #917afd;
 }
 
 * {
