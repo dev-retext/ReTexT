@@ -9,8 +9,10 @@
 </template>
 
 <script>
-import Navbar from "./components/Flame/Navbar.vue";
+import { auth } from "./main";
+import { onAuthStateChanged } from "@firebase/auth";
 import Header from "./components/Flame/Header.vue";
+import Navbar from "./components/Flame/Navbar.vue";
 
 export default {
   name: "App",
@@ -22,16 +24,31 @@ export default {
     return {
       title: "Vue Navigation Bar",
       hideNavigation: false,
+      isLoggedIn: false,
     };
   },
   created() {
+    // Firebaseのログイン状態の監視
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.isLoggedIn = true;
+      } else {
+        this.isLoggedIn = false;
+      }
+    });
+
     this.$router.beforeEach((to, from, next) => {
       if (to.meta.hideNavigation == true) {
         this.hideNavigation = true;
       } else {
         this.hideNavigation = false;
       }
-      next();
+
+      if (to.meta.requiresAuth && !this.isLoggedIn) {
+        next("/sign_in");
+      } else {
+        next();
+      }
     });
   },
 };
@@ -39,32 +56,28 @@ export default {
 
 <style>
 :root {
-  --text-light-gray: #55575f;
-  --text-purple: #917afd;
+  --text-light-gray: #76767a;
+  --text-deep-gray: #333236;
+  --text-purple: #6246EA;
 }
 
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
-#app {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  height: 100vh;
-  background-color: #f7fafc;
+body {
+  overflow: hidden;
 }
 
-.main-content {
-  flex-grow: 1;
-  padding: 20px;
+li {
+  list-style: none;
 }
 
-@media (max-width: 414px) {
-  .main-content {
-    padding: 10px;
-  }
+a:link,
+a:visited,
+a:hover,
+a:active {
+  text-decoration: none;
 }
 </style>

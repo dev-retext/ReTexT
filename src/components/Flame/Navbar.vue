@@ -60,7 +60,6 @@ export default {
   align-items: center;
   width: 100%;
   height: 80px;
-  padding: 0 20px;
   background-color: #fff;
   border-top: 1px solid #e2e8f0;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
@@ -76,7 +75,6 @@ export default {
   height: 100%;
   font-size: 12px;
   font-weight: 600;
-  color: #718096;
 }
 
 .navbar__item__icon {
@@ -85,7 +83,6 @@ export default {
   color: var(--text-light-gray);
 }
 .navbar__item__label {
-  /* text-transform: uppercase; */
   font-size: 12px;
   color: var(--text-light-gray);
 }
