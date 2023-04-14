@@ -12,7 +12,7 @@
     "firebase": "^9.19.1",
     "remixicon": "^3.0.0",
     "vue": "^3.2.36",
-    "vue-router": "^4.0.3",
+    "vue-router": "^4.1.6",
     "vuefire": "^3.1.0",
     "vuex": "^4.0.0"
   },
