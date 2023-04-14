@@ -5,6 +5,7 @@ import store from "./store"
 import { initializeApp } from 'firebase/app'
 import { getAuth } from "firebase/auth"
 import { getDatabase } from 'firebase/database'
+import { getFirestore, collection, addDoc } from 'firebase/firestore'
 import "remixicon/fonts/remixicon.css"
 
 const firebaseConfig = {
@@ -22,11 +23,15 @@ console.log(firebaseConfig)
 const firebaseApp = initializeApp(firebaseConfig)
 const auth = getAuth(firebaseApp)
 const realtimeDB = getDatabase(firebaseApp)
+const fireDB = getFirestore(firebaseApp)
 
 createApp(App).use(store).use(router).mount("#app")
 
 export {
   firebaseApp,
   auth,
-  realtimeDB
+  realtimeDB,
+  fireDB,
+  collection,
+  addDoc
 }

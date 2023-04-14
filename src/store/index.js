@@ -16,11 +16,11 @@ export default createStore({
     products: {
       ProductID: {
         ProductName: "",
+        ProductAuthor: "",
         ProductImage: "",
         ProductQuality: "",
         Remark: "",
         Tags: {
-          Favorite: false,
           Coverless: false,
           Crease: false,
           Dirty: false,
