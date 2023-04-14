@@ -1,190 +1,113 @@
 import { createStore } from "vuex";
-import { db } from "../main"
+import { realtimeDB } from "../main"
+import { set, ref, get } from "firebase/database"
 
 export default createStore({
   state: {
-    user: {
+    userData: {
       Uid: "",
       NickName: "",
       Email: "",
       Password: "",
       Gender: "",
       University: "",
-      Products: {
-        ProductID: {
-          ProductName: "",
-          ProductImage: "",
-          ProductQuality: "",
-          Remark: "",
-          Tags: {
-            Favorite: null,
-            Coverless: null,
-            Crease: null,
-            Dirty: null,
-            Written: null,
-          }
-        },
-      },
-      Favorite: {
-        ProductID: ""
-      },
-      TradeHistory: {
-        TransID: {
-          TransDate: "",
-          TransProduct: "",
-          TransPartner: "",
-          TransEvaluation: "",
-        }
-      }
+      Favorite: []
     },
-    LoginStatus: false
-  },
-  getters: {
-    getUid: (state) => {
-      return state.Uid
-    },
-    getNickName: (state) => {
-      return state.user.NickName
-    },
-    getEmail: (state) => {
-      return state.user.Email
-    },
-    getPassword: (state) => {
-      return state.user.Password
-    },
-    getGender: (state) => {
-      return state.user.Gender
-    },
-    getUniversity: (state) => {
-      return state.user.University
-    },
-    getProductID: (state) => {
-      return state.user.Products.ProductID
-    },
-    getProductName: (state) => (ProductID) => {
-      return state.user.Products[ProductID].ProductName
-    },
-    getProductImage: (state) => (ProductID) => {
-      return state.user.Products[ProductID].ProductImage
-    },
-    getProductQuality: (state) => (ProductID) => {
-      return state.user.Products[ProductID].ProductQuality
-    },
-    getProductRemark: (state) => (ProductID) => {
-      return state.user.Products[ProductID].ProductRemark
-    },
-    getProductTags: (state) => (ProductID) => {
-      return state.user.Products[ProductID].Tags
-    },
-    getFavorite: (state) => (ProductID) => {
-      return state.user.Favorite[ProductID]
-    },
-    getTradeHistoryID: (state) => {
-      return state.user.TradeHistory.TransID
-    },
-    getTransData: (state) => (TransID) => {
-      return state.user.TradeHistory[TransID].TransDate
-    },
-    getTransProduct: (state) => (TransID) => {
-      return state.user.TradeHistory[TransID].TransProduct
-    },
-    getTransPartner: (state) => (TransID) => {
-      return state.user.TradeHistory[TransID].TransPartner
-    },
-    getTransEvaluation: (state) => (TransID) => {
-      return state.user.TradeHistory[TransID].TransEvaluation
-    },
-    getLoginStatus: (state) => {
-      return state.loginStatus
-    }
-  },  
-  mutations: {
-    setUid(state, Uid) {
-      state.user.Uid = Uid;
-    },
-    setNickName(state, NickName) {
-      state.user.NickName = NickName;
-    },
-    setEmail(state, Email) {
-      state.user.Email = Email;
-    },
-    setPassword(state, Password) {
-      state.user.Password = Password;
-    },
-    setGender(state, Gender) {
-      state.user.Gender = Gender
-    },
-    setUniversity(state, University) {
-      state.user.University = University
-    },
-    setProduct(state, Product) {
-      state.user.Product[Product.newProductID] = {
+    products: {
+      ProductID: {
         ProductName: "",
         ProductImage: "",
         ProductQuality: "",
         Remark: "",
         Tags: {
-          Favorite: null,
-          Coverless: null,
-          Crease: null,
-          Dirty: null,
-          Written: null,
-        },
+          Favorite: false,
+          Coverless: false,
+          Crease: false,
+          Dirty: false,
+          Written: false
+        }
       }
     },
-    setFavorite(state, ProductID) {
-      state.user.Favorite[ProductID] = ""
-    },
-    setTrade(state, Trade) {
-      state.user.TradeHistory[Trade.newTransID] = {
+    tradeHistory: {
+      TransID: {
         TransDate: "",
-        TransProduct: "",
-        TransPartner: "",
-        TransEvaluation: "",
+        TransProduct: {
+          ProductID: ""
+        },
+        TransPartner: {
+          Uid: "",
+          NickName: ""
+        },
+        TransEvaluation: ""
       }
     },
+    LoginStatus: false
+  },
+  getters: {},  
+  mutations: {
     setLoginStatus(state, bool) {
       state.LoginStatus = bool
-    }
+    },
+    setUid(state, Uid) {
+      state.userData.Uid = Uid
+    },
+    setNickName(state, NickName) {
+      state.userData.NickName = NickName
+    },
+    setEmail(state, Email) {
+      state.userData.Email = Email
+    },
+    setPassword(state, Password) {
+      state.userData.Password = Password
+    },
+    setGender(state, Gender) {
+      state.userData.Gender = Gender
+    },
+    setUniversity(state, University) {
+      state.userData.University = University
+    },
+    setFavorite(state, Favorite) {
+      state.userData.Favorite = Favorite
+    },
   },
   actions: {
-    async createUser({commit}, user) {
-      try {
-        const userRef = db.ref(`users/${user.uid}`)
-        await userRef.set(user)
-
-        commit("setUid", user.uid)
-        commit("setNickName", user.nickname)
-        commit("setEmail", user.email)
-        commit("setGender", user.gender)
-        commit("setUniversity", user.university)
-      } catch (error) {
-        console.error(error)
+    // サインアップに成功した時に, 初期データを登録する用
+    async createUserDB({ commit }, arrivedData) {
+      const registerData = {
+        Email: arrivedData.Email,
+        Password: arrivedData.Password,
+        NickName: arrivedData.NickName,
+        Gender: arrivedData.Gender,
+        University: arrivedData.University,
       }
-    },
-    async fetchUserData({commit}, uid) {
+      const Uid = arrivedData.Uid
+      await set(ref(realtimeDB, `Users/${Uid}/`), registerData)
+      // vuexストアへ
+      commit("setUid", registerData.Uid)
+      commit("setNickName", registerData.NickName);
+      commit("setEmail", registerData.Email);
+      commit("setPassword", registerData.Password);
+      commit("setGender", registerData.Gender);
+      commit("setUniversity", registerData.University);
+    },    
+    // サインインに成功した時に, データを取得する用
+    async fetchUserData({ commit }, uid) {
+      const userRef = ref(realtimeDB, `Users/${uid}`)
       try {
-        const userRef = db.ref(`users/${uid}`)
-        const snapshot = await userRef.once("value")
+        const snapshot = await get(userRef)
         const userData = snapshot.val()
-        commit("setUid", uid)
-        commit("setNickName", userData.NickName)
-        commit("setEmail", userData.Email)
-        commit("setPassword", userData.Password)
-        commit("setGender", userData.Gender)
-        commit("setUniversity", userData.University)
-        commit("setProducts", userData.Products)
-        commit("setFavorite", userData.Favorite)
-        commit("setTradeHistory", userData.TradeHistory)
+        console.log(snapshot)
+        console.log(userData)
+        commit('setUid', uid)
+        commit('setNickName', userData.NickName)
+        commit('setEmail', userData.Email)
+        commit('setPassword', userData.Password)
+        commit('setGender', userData.Gender)
+        commit('setUniversity', userData.University)
+        commit('setFavorite', userData.Favorite)
       } catch (error) {
         console.error(error)
       }
-    },
-    setNewProduct({commit}, ProductID) {
-      commit("setProduct", ProductID)
-    },
-    setFavoriteProduct({commit}, ProductID) {
-      commit("setFavorite", ProductID)
-    },
+    }    
   }
 });
