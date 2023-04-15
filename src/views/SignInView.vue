@@ -4,12 +4,10 @@
       <h1>Sign In</h1>
       <form @submit.prevent="signIn">
         <div>
-          <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" required>
+          <label>Email:<input type="email" id="email" v-model="email" required></label>
         </div>
         <div>
-          <label for="password">Password:</label>
-          <input type="password" id="password" v-model="password" required>
+          <label>Password:<input type="password" id="password" v-model="password" required></label>
         </div>
         <button type="submit">Sign In</button>
       </form>

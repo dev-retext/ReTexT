@@ -4,24 +4,19 @@
       <h2>Create your account</h2>
       <form @submit.prevent="signUp">
         <div class="form-control">
-          <label for="email">Email</label>
-          <input type="email" id="email" v-model="email" required />
+          <label>Email:<input type="email" id="email" v-model="email" required /></label>
         </div>
         <div class="form-control">
-          <label for="password">Password</label>
-          <input type="password" id="password" v-model="password" required />
+          <label>Password:<input type="password" id="password" v-model="password" required /></label>
         </div>
         <div class="form-control">
-          <label for="nickname">Nickname</label>
-          <input type="text" id="nickname" v-model="nickname" required />
+          <label>Nickname:<input type="text" id="nickname" v-model="nickname" required /></label>
         </div>
         <div class="form-control">
-          <label for="gender">Gender</label>
-          <input type="text" id="gender" v-model="gender" />
+          <label>Gender:<input type="text" id="gender" v-model="gender" /></label>
         </div>
         <div class="form-control">
-          <label for="university">University</label>
-          <input type="text" id="university" v-model="university" />
+          <label>University:<input type="text" id="university" v-model="university" /></label>
         </div>
         <button type="submit">Create account</button>
       </form>

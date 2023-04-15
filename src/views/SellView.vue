@@ -1,57 +1,92 @@
 <template>
-  <div>
-    <form>
-  <label>
-    商品名:
-    <input type="text" name="name" required>
-  </label>
-  <label>
-    著者名:
-    <input type="text" name="author" required>
-  </label>
-  <label>
-    商品画像:
-    <input type="file" accept="image/*" name="image" required>
-  </label>
-  <label>
-    品質評価:
-    <select name="quality" required>
-      <option value="5">★★★★★</option>
-      <option value="4">★★★★☆</option>
-      <option value="3">★★★☆☆</option>
-      <option value="2">★★☆☆☆</option>
-      <option value="1">★☆☆☆☆</option>
-    </select>
-  </label>
-  <label>
-    備考:
-    <textarea name="remark" rows="5" cols="30"></textarea>
-  </label>
-  <label>
-    タグ:
-    <ul>
-      <li><input type="checkbox" name="tags[]" value="Coverless">カバーなし</li>
-      <li><input type="checkbox" name="tags[]" value="Crease">シワあり</li>
-      <li><input type="checkbox" name="tags[]" value="Dirty">汚れあり</li>
-      <li><input type="checkbox" name="tags[]" value="Written">書き込みあり</li>
-    </ul>
-  </label>
-  <button type="submit">登録</button>
-</form>
-
+  <div class="sell-flame">
+    <form @submit.prevent="submitForm">
+      <div class="group group-name">
+        <label>
+          商品名:
+          <input type="text" name="name" v-model="name" required />
+        </label>
+      </div>
+      <div class="group group-author">
+        <label>
+          著者名:
+          <input type="text" name="author" v-model="author" required />
+        </label>
+      </div>
+      <div class="group group-image">
+        <label>
+          商品画像:
+          <input
+            type="file"
+            accept="image/*"
+            name="image"
+            @change="handleImageUpload"
+            required
+          />
+        </label>
+      </div>
+      <div class="group group-quality">
+        <label>
+          品質評価:
+          <select name="quality" v-model="quality" required>
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+          </select>
+        </label>
+      </div>
+      <div class="group group-remark">
+        <label>
+          備考:
+          <textarea
+            name="remark"
+            rows="5"
+            cols="30"
+            v-model="remark"
+          ></textarea>
+        </label>
+      </div>
+      <div class="group group-tags">
+        <label>タグ:</label>
+        <label>
+          <input
+            type="checkbox"
+            name="Coverless"
+            v-model="tags.Coverless"
+          />カバーなし
+        </label>
+        <label>
+          <input type="checkbox" name="Crease" v-model="tags.Crease" />シワあり
+        </label>
+        <label>
+          <input type="checkbox" name="Dirty" v-model="tags.Dirty" />汚れあり
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="Written"
+            v-model="tags.Written"
+          />書き込みあり
+        </label>
+      </div>
+      <div class="submit-button">
+        <button type="submit">登録</button>
+      </div>
+    </form>
+    <div class="disp-registered-products"></div>
+    <div class="disp-traded-products"></div>
   </div>
 </template>
 
 <script>
-import { ref } from 'firebase/firestore';
-import { fireDB, addDoc } from '../main';
-
 export default {
-  name: 'SellView',
+  name: "SellView",
   data() {
     return {
-      name: '',
-      author: '',
+      name: "",
+      author: "",
       image: null,
       quality: null,
       remark: "",
@@ -59,76 +94,62 @@ export default {
         Coverless: false,
         Crease: false,
         Dirty: false,
-        Written: false
+        Written: false,
       },
     };
   },
   methods: {
-    async addProduct() {
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.image = reader.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    async submitForm() {
       try {
-        const productsRef = ref(fireDB, 'Products');
-        const docRef = await addDoc(productsRef, {
-          ProductName: this.name,
-          ProductAuthor: this.author,
-          ProductImage: this.image,
-          ProductQuality: this.quality,
-          Remark: this.remark,
-          Tags: this.tags,
-        });
-        console.log("Document written with ID: ", docRef.id);
-        this.name = '';
-        this.author = '';
-        this.image = null;
-        this.quality = null;
-        this.remark = '';
-        this.tags = {
-          Coverless: false,
-          Crease: false,
-          Dirty: false,
-          Written: false,
+        // Firestoreに登録するデータを設定
+        const newProductData = {
+          name: this.name,
+          author: this.author,
+          image: this.image,
+          quality: this.quality,
+          remark: this.remark,
+          tags: this.tags,
         };
-      } catch (e) {
-        console.error("Error adding document: ", e);
+        // Firestoreにデータを登録し, vuexストアとrealtime databaseにProductIDを記憶
+        await this.$store.dispatch("addProduct", newProductData);
+        // 登録完了メッセージを表示
+        console.log("商品が登録されました");
+        this.resetForm();
+      } catch (error) {
+        console.log(error);
       }
     },
+    resetForm: function () {
+      // フォームを初期化
+      this.name = "";
+      this.author = "";
+      this.image = null;
+      this.quality = null;
+      this.remark = "";
+      this.tags = {
+        Coverless: false,
+        Crease: false,
+        Dirty: false,
+        Written: false,
+      };
+    },
+  },
+  // このページを開いたら商品データを取得する
+  computed: {
+    registeredProductIDs() {
+      return this.$store.state.userData.RegisteredProductIDs;
+    },
+  },
+  async created() {
+    await this.$store.dispatch("fetchProductsByIDs", this.registeredProductIDs);
   },
 };
 </script>
-
-
-<style scoped>
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-form label {
-  margin: 10px 0;
-}
-
-form input[type="text"],
-form input[type="file"],
-form textarea {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
-
-form select {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
-
-form button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-</style>
