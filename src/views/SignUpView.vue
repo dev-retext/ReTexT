@@ -52,7 +52,6 @@ export default {
           };
           this.$store.dispatch("createUserDB", registerData);
           console.log("サインアップに成功!!")
-          this.$store.commit("setLoginStatus", true);
           this.$router.push("/")
         })
         .catch((error) => {

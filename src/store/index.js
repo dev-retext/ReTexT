@@ -2,11 +2,7 @@ import { createStore } from "vuex";
 import { realtimeDB, firestoreDB, storage } from "../main";
 import { set, ref as dbRef, get, update } from "firebase/database";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
-import {
-  ref as storageRef,
-  getDownloadURL,
-  uploadBytes,
-} from "firebase/storage";
+import { ref as storageRef, getDownloadURL, uploadBytes } from "firebase/storage";
 
 export default createStore({
   state: {
@@ -34,11 +30,16 @@ export default createStore({
       },
     },
     loginStatus: false,
+    isLoading: false,
   },
-  getters: {},
+
+
   mutations: {
     setLoginStatus(state, bool) {
       state.loginStatus = bool;
+    },
+    setIsLoading(state, bool) {
+      state.isLoading = bool;
     },
     setUid(state, Uid) {
       state.userData.Uid = Uid;
@@ -74,11 +75,15 @@ export default createStore({
       state.products[id] = data;
     },
   },
+
+
   actions: {
     /* サインアップに成功した時に, 初期データを登録する用 */
     async createUserDB({ commit, dispatch }, arrivedData) {
-      commit("addDemoData");
+      await commit("setIsLoading", true);
       try {
+        // デモデータを取得
+        await commit("addDemoData");
         // realtime databaseとvuexストアに登録するIDとユーザーデータを設定
         const Uid = arrivedData.Uid;
         const registerData = {
@@ -98,20 +103,23 @@ export default createStore({
         commit("setGender", registerData.Gender);
         commit("setUniversity", registerData.University);
         // Firestoreからデモデータを取得し, vuexストアへ
-        const ID = ["demoID"];
+        const ID = await ["demoID"];
         dispatch("fetchProductsByIDs", ID);
       } catch (error) {
         console.log(error);
       }
+      commit("setIsLoading", false);
     },
+
     /* サインインに成功した時に, データを取得する用 */
     async fetchUserData({ commit, dispatch }, uid) {
-      // UIDで自分のユーザー情報が置いてある場所を参照
-      const userRef = dbRef(realtimeDB, `Users/${uid}`);
+      await commit("setIsLoading", true);
       try {
+        // UIDで自分のユーザー情報が置いてある場所を参照
+        const userRef = await dbRef(realtimeDB, `Users/${uid}`);
         // UID以下のユーザー情報を全て取得
         const snapshot = await get(userRef);
-        const userData = snapshot.val();
+        const userData = await snapshot.val();
         commit("setUid", uid);
         commit("setNickName", userData.NickName);
         commit("setEmail", userData.Email);
@@ -119,41 +127,48 @@ export default createStore({
         commit("setGender", userData.Gender);
         commit("setUniversity", userData.University);
         // 配列が空だったら, そのままにしておく
-        const favorite = userData.MarkedProductIDs || [];
-        const productIds = userData.RegisteredProductIDs || [];
+        const favorite = await userData.MarkedProductIDs || [];
+        const productIds = await userData.RegisteredProductIDs || [];
         commit("setMarkedProductIDs", favorite);
         commit("setRegisteredProductID", productIds);
         // Firestoreからデモデータを取得し, vuexストアへ
-        const ID = ["demoID"];
+        const ID = await ["demoID"];
         dispatch("fetchProductsByIDs", ID);
       } catch (error) {
         console.error(error);
       }
+      commit("setIsLoading", false);
     },
+
     /* Storageに画像を登録し, 公開URLを取得する */
-    async registerImage({ dispatch }, { imageFile: imageFile }) {
+    async registerImage({ commit, dispatch }, { imageFile: imageFile }) {
+      commit("setIsLoading", true);
       try {
         await console.log(imageFile.name);
         const imageName = await imageFile.name.split(".")[0];
         console.log(imageName);
         // 現在時刻を取得
         const nowDate = await dispatch("getNowDate");
-        console.log(nowDate);
-
+        // 画像データ名と登録日を合わせて独自の画像データを格納場所を作成
         const imageDataName = await `${imageName + "_" + nowDate}`;
+        // Storageの参照先を作成
         const fileRef = await storageRef(
           storage,
           `book_images/` + imageDataName
         );
+        // 画像データをStorageへ
         await uploadBytes(fileRef, imageFile);
+        // 画像データの公開URLを取得
         const url = await getDownloadURL(fileRef);
-        console.log(url);
+        // 取得した公開URLを返す(※親元でローディング終了判定)
         return url;
       } catch (error) {
         console.log(error);
       }
     },
+
     /* 商品画像名を用いてStorageから商品画像を取得 */
+
     /* 現在時刻を取得 */
     getNowDate() {
       const now = new Date();
@@ -165,6 +180,7 @@ export default createStore({
       const seconds = now.getSeconds().toString().padStart(2, "0");
       return (year + month + day + hours + minutes + seconds);
     },
+
     /* Firestoreに商品を登録(出品)し, vuexストアとrealtime databaseにProductIDを記憶 */
     async addProduct({ commit, state }, newProductData) {
       try {
@@ -187,8 +203,10 @@ export default createStore({
         console.log(error);
       }
     },
+
     /* Firestoreから商品IDを用いて任意の商品データをvuexストアに取得 */
     async fetchProductsByIDs({ commit }, ids) {
+      commit("setIsLoading", true);
       try {
         // 引数の配列内の全ての商品IDの分、Firestoreから商品データを取得
         await Promise.all(
@@ -205,6 +223,7 @@ export default createStore({
       } catch (error) {
         console.error(error);
       }
+      commit("setIsLoading", false);
     },
   },
 });

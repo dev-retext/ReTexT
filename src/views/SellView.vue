@@ -1,6 +1,5 @@
 <template>
   <div class="sell-flame">
-    <img :src="imageURL" alt="デモ画像">
     <form @submit.prevent="submitForm">
       <div class="group group-name">
         <label>
@@ -113,7 +112,6 @@ export default {
         // 画像をStorageに保存し, 公開URLを取得
         const ImageURL = await this.$store.dispatch("registerImage", {imageFile: this.tmpImageFile})
         console.log("返されたurl : ", ImageURL)
-        // -----------------------------------------------------
         // Firestoreに登録するデータを設定(入力フォームから取得)
         const newProductData = await {
           ProductName: this.name,
@@ -123,11 +121,11 @@ export default {
           Remark: this.remark,
           Tags: this.tags,
         };
-        console.log(newProductData)
         // Firestoreにデータを登録し, vuexストアとrealtime databaseにProductIDを記憶
         await this.$store.dispatch("addProduct", newProductData);
         // 登録完了メッセージを表示
         console.log("商品が登録されました");
+        this.$store.commit("setIsLoading", false);
         // 入力フォームを初期化
         this.resetForm();
       } catch (error) {
@@ -150,15 +148,11 @@ export default {
       this.$refs.imageInput.value = null;
     },
   },
-  computed: {
-    imageURL() {
-      return this.$store.state.products.BogcINJYtIneH3lOBGZm.ProductImage
-    }
-  },
-  async mounted() {
-    /* このページを開いたら商品データを取得する */
-    console.log("ページを開くたびに実行")
-    await this.$store.dispatch("fetchProductsByIDs", this.$store.state.userData.RegisteredProductIDs)
-  },
+  computed: {},
+  // async mounted() {
+  //   /* このページを開いたら商品データを取得する */
+  //   console.log("ページを開くたびに実行")
+  //   // await this.$store.dispatch("fetchProductsByIDs", this.$store.state.userData.RegisteredProductIDs)
+  // },
 };
 </script>

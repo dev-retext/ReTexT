@@ -2,6 +2,7 @@
   <div id="app">
     <Header />
     <div class="main-content">
+      <LoadingView v-if="$store.state.isLoading"/>
       <router-view />
     </div>
     <navbar v-if="!hideNavigation" />
@@ -13,12 +14,14 @@ import { auth } from "./main";
 import { onAuthStateChanged } from "@firebase/auth";
 import Header from "./components/Flame/Header.vue";
 import Navbar from "./components/Flame/Navbar.vue";
+import LoadingView from "./views/LoadingView.vue";
 
 export default {
   name: "App",
   components: {
     Navbar,
     Header,
+    LoadingView,
   },
   data() {
     return {
