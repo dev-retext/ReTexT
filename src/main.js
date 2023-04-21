@@ -6,6 +6,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import "remixicon/fonts/remixicon.css";
 
 const firebaseConfig = {
@@ -20,12 +21,16 @@ const firebaseConfig = {
   measurementId: "G-1W0EJYENKN",
 };
 
-console.log(firebaseConfig);
+// firebase
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
+// realtime database
 const realtimeDB = getDatabase(firebaseApp);
+// Firestore
 const firestoreDB = getFirestore(firebaseApp);
+// Storage
+const storage = getStorage(firebaseApp)
 
 createApp(App).use(store).use(router).mount("#app");
 
-export { firebaseApp, auth, realtimeDB, firestoreDB };
+export { firebaseApp, auth, realtimeDB, firestoreDB, storage };

@@ -1,16 +1,17 @@
 <template>
   <div class="sell-flame">
+    <img :src="imageURL" alt="デモ画像">
     <form @submit.prevent="submitForm">
       <div class="group group-name">
         <label>
           商品名:
-          <input type="text" name="name" v-model="name" required />
+          <input type="text" v-model="name" required />
         </label>
       </div>
       <div class="group group-author">
         <label>
           著者名:
-          <input type="text" name="author" v-model="author" required />
+          <input type="text" v-model="author" required />
         </label>
       </div>
       <div class="group group-image">
@@ -19,8 +20,8 @@
           <input
             type="file"
             accept="image/*"
-            name="image"
-            @change="handleImageUpload"
+            @change="uploadImageFile"
+            ref="imageInput"
             required
           />
         </label>
@@ -28,7 +29,7 @@
       <div class="group group-quality">
         <label>
           品質評価:
-          <select name="quality" v-model="quality" required>
+          <select v-model="quality" required>
             <option value="5">★★★★★</option>
             <option value="4">★★★★☆</option>
             <option value="3">★★★☆☆</option>
@@ -41,7 +42,6 @@
         <label>
           備考:
           <textarea
-            name="remark"
             rows="5"
             cols="30"
             v-model="remark"
@@ -53,20 +53,18 @@
         <label>
           <input
             type="checkbox"
-            name="Coverless"
             v-model="tags.Coverless"
           />カバーなし
         </label>
         <label>
-          <input type="checkbox" name="Crease" v-model="tags.Crease" />シワあり
+          <input type="checkbox" v-model="tags.Crease" />シワあり
         </label>
         <label>
-          <input type="checkbox" name="Dirty" v-model="tags.Dirty" />汚れあり
+          <input type="checkbox" v-model="tags.Dirty" />汚れあり
         </label>
         <label>
           <input
             type="checkbox"
-            name="Written"
             v-model="tags.Written"
           />書き込みあり
         </label>
@@ -85,6 +83,7 @@ export default {
   name: "SellView",
   data() {
     return {
+      // フォームから取得する商品データを一時的に確保しておく用
       name: "",
       author: "",
       image: null,
@@ -96,39 +95,47 @@ export default {
         Dirty: false,
         Written: false,
       },
+      // フォームから取得する画像データを一時的に確保しておく用
+      tmpImageFile: null,
     };
   },
   methods: {
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.image = reader.result;
-      };
-      reader.readAsDataURL(file);
+    /* 画像を取り込む */
+    async uploadImageFile(event) {
+      this.tmpImageFile = event.target.files[0];
+      console.log("画像データの取得")
+      console.log(this.tmpImageFile)
+      console.log(this.tmpImageFile.name)
     },
+    /* 商品を出品する */
     async submitForm() {
       try {
-        // Firestoreに登録するデータを設定
-        const newProductData = {
-          name: this.name,
-          author: this.author,
-          image: this.image,
-          quality: this.quality,
-          remark: this.remark,
-          tags: this.tags,
+        // 画像をStorageに保存し, 公開URLを取得
+        const ImageURL = await this.$store.dispatch("registerImage", {imageFile: this.tmpImageFile})
+        console.log("返されたurl : ", ImageURL)
+        // -----------------------------------------------------
+        // Firestoreに登録するデータを設定(入力フォームから取得)
+        const newProductData = await {
+          ProductName: this.name,
+          ProductAuthor: this.author,
+          ProductImage: ImageURL,
+          ProductQuality: this.quality,
+          Remark: this.remark,
+          Tags: this.tags,
         };
+        console.log(newProductData)
         // Firestoreにデータを登録し, vuexストアとrealtime databaseにProductIDを記憶
         await this.$store.dispatch("addProduct", newProductData);
         // 登録完了メッセージを表示
         console.log("商品が登録されました");
+        // 入力フォームを初期化
         this.resetForm();
       } catch (error) {
         console.log(error);
       }
     },
+    /* 入力フォームを初期化する */
     resetForm: function () {
-      // フォームを初期化
       this.name = "";
       this.author = "";
       this.image = null;
@@ -140,16 +147,18 @@ export default {
         Dirty: false,
         Written: false,
       };
+      this.$refs.imageInput.value = null;
     },
   },
-  // このページを開いたら商品データを取得する
   computed: {
-    registeredProductIDs() {
-      return this.$store.state.userData.RegisteredProductIDs;
-    },
+    imageURL() {
+      return this.$store.state.products.BogcINJYtIneH3lOBGZm.ProductImage
+    }
   },
-  async created() {
-    await this.$store.dispatch("fetchProductsByIDs", this.registeredProductIDs);
+  async mounted() {
+    /* このページを開いたら商品データを取得する */
+    console.log("ページを開くたびに実行")
+    await this.$store.dispatch("fetchProductsByIDs", this.$store.state.userData.RegisteredProductIDs)
   },
 };
 </script>
