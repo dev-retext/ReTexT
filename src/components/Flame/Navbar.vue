@@ -55,11 +55,12 @@ export default {
 .navbar {
   position: fixed;
   bottom: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 999;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: 80px;
   background-color: #fff;
   border-top: 1px solid #e2e8f0;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
