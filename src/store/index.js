@@ -15,6 +15,7 @@ export default createStore({
       University: "",
       MarkedProductIDs: [],
       RegisteredProductIDs: [],
+      TalkedUserIDs: [],
     },
     products: {
       // サインアップ時に, Firestoreからデモデータを強制保存させる
@@ -29,6 +30,15 @@ export default createStore({
         TradeEvaluation: "4",
       },
     },
+    chatUserData: {
+      // チャットデータを一時保存する用
+      userID: {
+        iconImage: "",
+        userName: "", 
+        pastTalk: "",
+        pastTalkTime: "",
+      }
+    }, 
     loginStatus: false,
     isLoading: false,
   },
@@ -73,6 +83,9 @@ export default createStore({
     },
     storeProductToVuex(state, { id, data }) {
       state.products[id] = data;
+    },
+    storeChatDataToVuex(state, { id, data }) {
+      state.chatUserData[id] = data;
     },
   },
 
@@ -167,8 +180,6 @@ export default createStore({
       }
     },
 
-    /* 商品画像名を用いてStorageから商品画像を取得 */
-
     /* 現在時刻を取得 */
     getNowDate() {
       const now = new Date();
@@ -224,6 +235,25 @@ export default createStore({
         console.error(error);
       }
       commit("setIsLoading", false);
+    },
+
+    /* FirestoreからユーザーIDを用いてチャットデータをvuexストアに取得 */
+    async fetchChatUserData({ commit }, ids) {
+      try {
+        // 
+        await Promise.all(
+          ids.map(async (id) => {
+            const docRef = await storageRef(firestoreDB,`Chats`,id);
+            const docSnap = await getDoc(docRef);
+            // 参照先のチャットデータを取得できたら, vuexストアに商品IDと商品データを登録
+            if (docSnap.exists()) {
+              commit("")
+            }
+          })
+        )
+      } catch (error) {
+        console.log(error)
+      }
     },
   },
 });

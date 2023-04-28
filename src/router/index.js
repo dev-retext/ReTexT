@@ -52,10 +52,11 @@ const routes = [
     meta: { hideNavigation: false, requireAuth: true }
   },
   {
-    path: '/chat_room',
+    path: '/chat_room/:usrID',
     name: 'chat_room',
     component: () => import('../views/ChatRoomView.vue'),
-    meta: { hideNavigation: true, requireAuth: true }
+    meta: { hideNavigation: true, requireAuth: true },
+    props: true
   },
   {
     path: '/saved_list',

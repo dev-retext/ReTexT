@@ -149,10 +149,10 @@ export default {
     },
   },
   computed: {},
-  // async mounted() {
-  //   /* このページを開いたら商品データを取得する */
-  //   console.log("ページを開くたびに実行")
-  //   // await this.$store.dispatch("fetchProductsByIDs", this.$store.state.userData.RegisteredProductIDs)
-  // },
+  /* このページを開いたら商品データを取得する */
+  async mounted() {
+    console.log("ページを開くたびに実行")
+    await this.$store.dispatch("fetchProductsByIDs", this.$store.state.userData.RegisteredProductIDs)
+  },
 };
 </script>

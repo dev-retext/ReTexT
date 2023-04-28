@@ -68,7 +68,4 @@ export default {
   justify-content: center;
   align-content: center;
 }
-.signup {
-  margin-top: 30%;
-}
 </style>
